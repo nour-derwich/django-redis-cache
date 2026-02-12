@@ -5,7 +5,8 @@ No HTTP, no Celery. Pure logic only.
 import pytest
 from decimal import Decimal
 from django.core.cache import cache
-from products.models import Product, Category
+from products.models.prodect import Product
+from products.models.category import Category
 from products.cache_utils import (
     get_cached_product,
     get_cached_product_by_slug,

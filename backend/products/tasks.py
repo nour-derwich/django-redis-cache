@@ -5,7 +5,8 @@ Demonstrates scheduled tasks and async data processing.
 from celery import shared_task
 from django.core.cache import cache
 from django.db.models import Sum, Avg, Count
-from .models import Product, Category
+from .models.prodect import Product
+from .models.category import Category
 from .cache_utils import (
     warm_cache_for_product,
     get_cache_statistics,

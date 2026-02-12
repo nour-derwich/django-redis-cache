@@ -3,7 +3,8 @@ Test script for cache invalidation signals.
 Run with: docker-compose exec backend python test_signals.py
 """
 from django.core.cache import cache
-from products.models import Product, Category
+from products.models.prodect import Product
+from products.models.category import Category
 
 def test_product_signals():
     print("Testing Product signals...")

@@ -42,17 +42,22 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'django.middleware.cache.UpdateCacheMiddleware',  # Cache middleware (first)
     'django.middleware.security.SecurityMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.cache.UpdateCacheMiddleware',       # Django cache (must be first)
     'django.middleware.common.CommonMiddleware',
+    'django.middleware.cache.FetchFromCacheMiddleware',    # Django cache (must be last-ish)
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.cache.FetchFromCacheMiddleware',  # Cache middleware (last)
 
+    # ── Custom Redis middleware ───────────────────────────────────────────────
+    # Runs after auth so request.user is available
+    'products.middleware.CacheMonitorMiddleware',      # adds X-Cache-Hit headers
+    'products.middleware.CacheBypassMiddleware',       # ?nocache=1 for staff
+    'products.middleware.RedisCacheHeaderMiddleware',  # Cache-Control headers
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -93,14 +98,14 @@ CACHES = {
         'BACKEND': 'django_redis.cache.RedisCache',
         'LOCATION': REDIS_URL,
         'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient', # Use default client for better performance
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
             'CONNECTION_POOL_KWARGS': {
-                'max_connections': 50, # Increased max connections for high concurrency
+                'max_connections': 50,
                 'retry_on_timeout': True,
             },
-            'SOCKET_CONNECT_TIMEOUT': 5, # Shorter timeout for better responsiveness under load
+            'SOCKET_CONNECT_TIMEOUT': 5,
             'SOCKET_TIMEOUT': 5,
-            'COMPRESSOR': 'django_redis.compressors.zlib.ZlibCompressor', # Compress data to reduce memory usage
+            'COMPRESSOR': 'django_redis.compressors.zlib.ZlibCompressor',
             'PARSER_CLASS': 'redis.connection.HiredisParser',
         },
         'KEY_PREFIX': 'redis_demo',
