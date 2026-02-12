@@ -3,10 +3,10 @@ Test script for cache invalidation signals.
 Run with: docker-compose exec backend python test_signals.py
 """
 from django.core.cache import cache
-from products.models.prodect import Product
+from products.models.product import Product
 from products.models.category import Category
 
-def test_product_signals():
+def test_product_signals(db):
     print("Testing Product signals...")
     
     # Create a product
@@ -40,7 +40,7 @@ def test_product_signals():
     assert cache.get(cache_key) is None, "❌ Cache not invalidated on delete"
     print("✅ Cache invalidated on product delete")
 
-def test_category_signals():
+def test_category_signals(db):
     print("\nTesting Category signals...")
     
     category = Category.objects.create(

@@ -19,7 +19,7 @@ def get_cached_product(product_id: int):
     Returns:
         Product instance or None if not in cache
     """
-    from .models.prodect import Product
+    from .models.product import Product
     
     cache_key = f'product_{product_id}'
     cached_product = cache.get(cache_key)
@@ -45,7 +45,7 @@ def get_cached_product_by_slug(slug: str):
     Returns:
         Product instance or None if not found
     """
-    from .models.prodect import Product
+    from .models.product import Product
     
     cache_key = f'product_slug_{slug}'
     cached_product = cache.get(cache_key)
@@ -72,7 +72,7 @@ def get_cached_products_list(filters: dict = None, limit: int = 20):
     Returns:
         List of Product instances
     """
-    from .models.prodect import Product
+    from .models.product import Product
     
     # Build cache key from filters
     filter_key = '_'.join([f"{k}_{v}" for k, v in sorted((filters or {}).items())])
@@ -126,7 +126,7 @@ def invalidate_product_cache(product_id: int):
     Args:
         product_id: Product ID
     """
-    from .models.prodect import Product
+    from .models.product import Product
     
     try:
         product = Product.objects.get(id=product_id)
@@ -180,7 +180,7 @@ def warm_cache_for_product(product_id: int):
     Args:
         product_id: Product ID
     """
-    from .models.prodect import Product
+    from .models.product import Product
     
     try:
         product = Product.objects.select_related('category').get(id=product_id)

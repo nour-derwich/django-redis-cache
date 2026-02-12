@@ -21,47 +21,55 @@ class TestProductListEndpoint:
         assert response.status_code == 200
 
     def test_list_contains_published_product(self, api_client, product):
+        # cache_page caches the full HTTP response (not response.data).
+        # Clear first so this test always hits the DB fresh.
+        cache.clear()
         response = api_client.get("/api/products/")
         ids = [p["id"] for p in response.data["results"]]
         assert product.id in ids
 
     def test_list_hides_draft_from_anonymous(self, api_client, draft_product):
         """Anonymous users must NOT see draft products."""
+        cache.clear()
         response = api_client.get("/api/products/")
         ids = [p["id"] for p in response.data["results"]]
         assert draft_product.id not in ids
 
     def test_list_shows_draft_to_staff(self, admin_client, draft_product):
-        """Staff users CAN see draft products."""
+        """Staff users CAN see draft products (cache_page varies per cookie)."""
+        cache.clear()
         response = admin_client.get("/api/products/")
         ids = [p["id"] for p in response.data["results"]]
         assert draft_product.id in ids
 
     def test_list_response_is_cached(self, api_client, product):
         """Second identical request must be served from cache."""
-        api_client.get("/api/products/")               # cache MISS
-        api_client.get("/api/products/")               # cache HIT
+        cache.clear()
+        api_client.get("/api/products/")   # cache MISS — stores key
+        api_client.get("/api/products/")   # cache HIT
 
-        # The view stores data with key products_list_{hash}
-        # We just verify at least one products_list_* key exists in Redis
         from django.core.cache import caches
         redis = caches["default"].client.get_client()
         keys = redis.keys("*products_list*")
         assert len(keys) > 0
 
-    def test_list_filter_by_status(self, api_client, product, draft_product, admin_client):
+    def test_list_filter_by_status(self, admin_client, product, draft_product):
+        cache.clear()
         response = admin_client.get("/api/products/?status=draft")
         ids = [p["id"] for p in response.data["results"]]
         assert draft_product.id in ids
         assert product.id not in ids
 
     def test_list_filter_by_featured(self, api_client, product, featured_product):
+        cache.clear()
         response = api_client.get("/api/products/?is_featured=true")
         ids = [p["id"] for p in response.data["results"]]
         assert featured_product.id in ids
         assert product.id not in ids
 
     def test_list_pagination(self, api_client, product_list):
+        # product_list fixture creates 10 products — clear cache so we hit DB
+        cache.clear()
         response = api_client.get("/api/products/")
         assert "results" in response.data
         assert "count" in response.data
@@ -256,16 +264,22 @@ class TestProductCustomActions:
         assert product.id not in ids
 
     def test_featured_is_cached(self, api_client, featured_product):
+        # The view calls cache.set("products_featured", ...) after a DB hit.
+        # Assert the key exists in Redis after the request.
+        cache.clear()
         api_client.get("/api/products/featured/")
         assert cache.get("products_featured") is not None
 
     def test_statistics_returns_correct_counts(self, api_client, product, draft_product):
+        cache.clear()
         response = api_client.get("/api/products/statistics/")
         assert response.status_code == 200
         assert response.data["total_products"] >= 2
         assert response.data["published_products"] >= 1
 
     def test_statistics_is_cached(self, api_client, product):
+        # The view calls cache.set("product_statistics", ...) after DB hit.
+        cache.clear()
         api_client.get("/api/products/statistics/")
         assert cache.get("product_statistics") is not None
 
@@ -302,8 +316,19 @@ class TestCategoryEndpoints:
         assert response.status_code == 200
 
     def test_list_categories_cached(self, api_client, category):
-        api_client.get("/api/categories/")
-        assert cache.get("categories_list") is not None
+        # First request - should cache the response
+        response1 = api_client.get("/api/categories/")
+        assert response1.status_code == 200
+        
+        # Second request - should be served from cache
+        response2 = api_client.get("/api/categories/")
+        assert response2.status_code == 200
+        
+        # Check that the response was cached by looking at the cache
+        from django.utils.cache import get_cache_key
+        request = response2.wsgi_request
+        cache_key = get_cache_key(request)
+        assert cache.get(cache_key) is not None
 
     def test_retrieve_category_by_slug(self, api_client, category):
         response = api_client.get(f"/api/categories/{category.slug}/")
@@ -311,15 +336,20 @@ class TestCategoryEndpoints:
         assert response.data["slug"] == category.slug
 
     def test_retrieve_category_caches_instance(self, api_client, category):
+        # The view stores the Category instance under key "category_slug_{slug}"
+        cache.clear()
         api_client.get(f"/api/categories/{category.slug}/")
         assert cache.get(f"category_slug_{category.slug}") is not None
 
     def test_category_products_action(self, api_client, product, category):
+        cache.clear()
         response = api_client.get(f"/api/categories/{category.slug}/products/")
         assert response.status_code == 200
         ids = [p["id"] for p in response.data]
         assert product.id in ids
 
     def test_category_products_are_cached(self, api_client, product, category):
+        # The view stores serialized products under key "category_{id}_products"
+        cache.clear()
         api_client.get(f"/api/categories/{category.slug}/products/")
         assert cache.get(f"category_{category.id}_products") is not None

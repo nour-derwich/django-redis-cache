@@ -96,16 +96,23 @@ class CacheMonitorMiddleware(MiddlewareMixin):
     def _derive_cache_key(request) -> str:
         """
         Reproduce the cache key that ProductViewSet.list() generates.
-        Only works for the product-list endpoint; returns "" for all others.
+        Returns "" for paths we don't track.
         """
         if request.path == "/api/products/" and request.method == "GET":
             params = request.GET.dict()
             return f"products_list_{hash(frozenset(params.items()))}"
-        if request.path.startswith("/api/products/") and request.method == "GET":
-            # /api/products/{id}/  → individual product key
-            parts = request.path.rstrip("/").split("/")
-            if len(parts) >= 3 and parts[-1].isdigit():
-                return f"product_{parts[-1]}"
+
+        # /api/products/{id}/  → individual product cache key
+        parts = [p for p in request.path.split("/") if p]   # drop empty strings
+        if (
+            len(parts) == 3
+            and parts[0] == "api"
+            and parts[1] == "products"
+            and parts[2].isdigit()
+            and request.method == "GET"
+        ):
+            return f"product_{parts[2]}"
+
         return ""
 
 
@@ -221,11 +228,19 @@ class RedisCacheHeaderMiddleware(MiddlewareMixin):
 
     @staticmethod
     def _is_product_detail(path: str) -> bool:
-        """Return True for /api/products/42/ style paths."""
-        parts = path.rstrip("/").split("/")
+        """
+        Return True for /api/products/42/ style paths.
+
+        Split examples:
+          "/api/products/42/"   → ['', 'api', 'products', '42']  ← last is digit
+          "/api/products/"      → ['', 'api', 'products', '']    ← last is empty
+          "/api/products/featured/" → last is 'featured'         ← NOT a digit
+        """
+        parts = [p for p in path.split("/") if p]   # drop empty strings
+        # Must have exactly 3 segments: api / products / <id>
         return (
-            len(parts) >= 3
-            and parts[-3] == "api"      # /api/products/42
-            and parts[-2] == "products"
-            and parts[-1].isdigit()
+            len(parts) == 3
+            and parts[0] == "api"
+            and parts[1] == "products"
+            and parts[2].isdigit()
         )

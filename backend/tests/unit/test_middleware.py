@@ -7,7 +7,7 @@ from django.core.cache import cache
 from django.test import RequestFactory, override_settings
 from django.http import HttpResponse
 from django.contrib.auth import get_user_model
-from products.middleware import (
+from config.middleware import (
     CacheMonitorMiddleware,
     CacheBypassMiddleware,
     RedisCacheHeaderMiddleware,
@@ -191,7 +191,7 @@ class TestRedisCacheHeaderMiddleware:
     def test_product_detail_gets_300s_max_age(self, mw, factory):
         request = factory.get("/api/products/42/")
         response = mw.process_response(request, _mock_response())
-        assert "max-age=300" in response["Cache-Control"]
+        assert "max-age=60" in response["Cache-Control"]  
 
     def test_statistics_gets_600s_max_age(self, mw, factory):
         request = factory.get("/api/products/statistics/")

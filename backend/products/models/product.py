@@ -88,7 +88,9 @@ class Product(models.Model):
     @property
     def is_on_sale(self):
         """Check if product is on sale."""
-        return self.compare_at_price and self.compare_at_price > self.price
+        if self.compare_at_price is None:
+            return False
+        return self.compare_at_price > self.price
     
     @property
     def discount_percentage(self):

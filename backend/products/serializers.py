@@ -2,7 +2,7 @@
 Product serializers with caching strategies.
 """
 from rest_framework import serializers
-from .models.prodect import Product
+from .models.product import Product
 from .models.category import Category
 from django.core.cache import cache
 

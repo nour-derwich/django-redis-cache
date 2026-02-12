@@ -55,9 +55,9 @@ MIDDLEWARE = [
 
     # ── Custom Redis middleware ───────────────────────────────────────────────
     # Runs after auth so request.user is available
-    'products.middleware.CacheMonitorMiddleware',      # adds X-Cache-Hit headers
-    'products.middleware.CacheBypassMiddleware',       # ?nocache=1 for staff
-    'products.middleware.RedisCacheHeaderMiddleware',  # Cache-Control headers
+    'config.middleware.CacheBypassMiddleware',             # Bypass Redis cache for staff users
+    'config.middleware.CacheMonitorMiddleware',            # Monitor Redis cache hits/misses
+    'config.middleware.RedisCacheHeaderMiddleware',       # Add cache-related headers to responses
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -106,7 +106,7 @@ CACHES = {
             'SOCKET_CONNECT_TIMEOUT': 5,
             'SOCKET_TIMEOUT': 5,
             'COMPRESSOR': 'django_redis.compressors.zlib.ZlibCompressor',
-            'PARSER_CLASS': 'redis.connection.HiredisParser',
+            'PARSER_CLASS': 'redis.connection._HiredisParser',
         },
         'KEY_PREFIX': 'redis_demo',
         'TIMEOUT': int(os.environ.get('CACHE_TTL', 300)),  # 5 minutes default

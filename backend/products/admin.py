@@ -3,7 +3,8 @@ Admin configuration for products app.
 """
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import Product, Category
+from .models.product import Product
+from .models.category import Category
 
 
 @admin.register(Category)

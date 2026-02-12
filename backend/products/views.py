@@ -6,16 +6,14 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.core.cache import cache, caches
-from django.db import models  # Move this to the top
-from django.db.models import Sum, Avg, Count, Q, F  # Add F to imports
+from django.db.models import Sum, Avg, Count, Q , F
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.views.decorators.vary import vary_on_cookie
 from django_filters.rest_framework import DjangoFilterBackend
-import logging
 
-from .models.prodect import Product
-from .models.category import Category
+from .models .category import Category
+from .models.product import Product
 from .serializers import (
     ProductListSerializer,
     ProductDetailSerializer,
@@ -29,6 +27,7 @@ from .cache_utils import (
     get_cached_category,
     invalidate_product_list_cache
 )
+import logging
 
 logger = logging.getLogger(__name__)
 
@@ -168,10 +167,10 @@ class ProductViewSet(viewsets.ModelViewSet):
         cached_data = cache.get(cache_key)
         
         if cached_data:
-            logger.info("Cache HIT for featured products")
+            logger.info(f"Cache HIT for featured products")
             return Response(cached_data)
         
-        logger.info("Cache MISS for featured products")
+        logger.info(f"Cache MISS for featured products")
         
         queryset = self.get_queryset().filter(is_featured=True, status='published')[:10]
         serializer = ProductListSerializer(queryset, many=True)
@@ -205,13 +204,13 @@ class ProductViewSet(viewsets.ModelViewSet):
             'total_stock': Product.objects.aggregate(total=Sum('stock_quantity'))['total'] or 0,
             'low_stock_products': Product.objects.filter(
                 stock_quantity__gt=0,
-                stock_quantity__lte=F('low_stock_threshold')  # Now F is properly imported
+                stock_quantity__lte=F('low_stock_threshold')
             ).count(),
             'out_of_stock_products': Product.objects.filter(stock_quantity=0).count(),
             'featured_products': Product.objects.filter(is_featured=True).count(),
             'average_price': Product.objects.aggregate(avg=Avg('price'))['avg'] or 0,
             'total_value': Product.objects.aggregate(
-                total=Sum(F('price') * F('stock_quantity'))  # F is used here too
+                total=Sum(F('price') * F('stock_quantity'))
             )['total'] or 0,
         }
         
