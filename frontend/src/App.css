@@ -1,42 +1,110 @@
-#root {
-  max-width: 1280px;
+/* ── Reset & base ───────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+               Ubuntu, sans-serif;
+  background: #f1f5f9;
+  color: #1f2937;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; text-decoration: none; }
+
+.container {
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 0 1.5rem;
+}
+
+/* ── App shell ──────────────────────────────────────────────────────── */
+.app { min-height: 100vh; display: flex; flex-direction: column; }
+
+/* Header */
+.app-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, .35);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.app-header__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  height: 68px;
+}
+
+.app-header__brand { display: flex; align-items: center; gap: .85rem; }
+.app-header__logo  { font-size: 2rem; line-height: 1; }
+.app-header__title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -.3px;
+  line-height: 1.2;
+}
+.app-header__sub {
+  margin: 0;
+  font-size: .75rem;
+  opacity: .75;
+  font-weight: 400;
+}
+
+/* Nav */
+.app-nav { display: flex; gap: .25rem; }
+.app-nav__link {
+  padding: .45rem .9rem;
+  border-radius: 8px;
+  font-size: .88rem;
+  font-weight: 600;
+  color: rgba(255,255,255,.8);
+  transition: background .2s, color .2s;
+  white-space: nowrap;
+}
+.app-nav__link:hover          { background: rgba(255,255,255,.15); color: #fff; }
+.app-nav__link--active        { background: rgba(255,255,255,.22); color: #fff; }
+
+/* Main */
+.app-main  { flex: 1; padding: 2rem 0; }
+
+/* Footer */
+.app-footer {
+  background: #1f2937;
+  color: rgba(255,255,255,.55);
+  padding: 1.25rem 1.5rem;
   text-align: center;
+  font-size: .85rem;
 }
+.app-footer p { margin: 0 0 .5rem; }
+.app-footer__links { display: flex; justify-content: center; gap: 1.5rem; }
+.app-footer__links a {
+  color: rgba(255,255,255,.65);
+  font-weight: 600;
+  transition: color .2s;
+}
+.app-footer__links a:hover { color: #fff; }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+/* ── Global spinner (used by multiple components) ───────────────────── */
+.spinner {
+  width: 20px; height: 20px;
+  border: 3px solid #e5e7eb;
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+  flex-shrink: 0;
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
+@keyframes spin { to { transform: rotate(360deg); } }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
+/* ── Responsive ─────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .app-header__inner { height: auto; padding: .75rem 1rem; flex-wrap: wrap; }
+  .app-header__sub   { display: none; }
+  .app-nav__link     { font-size: .82rem; padding: .4rem .7rem; }
 }

@@ -1,0 +1,24 @@
+.featured-page__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+.featured-page__header h2 { margin: 0 0 .25rem; }
+.featured-page__sub { margin: 0; color: #6b7280; font-size: .85rem; }
+.featured-page__sub code {
+  background: #f3f4f6;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+  color: #4b5563;
+}
+.featured-page__loading,
+.featured-page__empty {
+  text-align: center;
+  padding: 3rem;
+  color: #6b7280;
+}
+.featured-page__loading .spinner { margin: 0 auto 1rem; }
