@@ -6,7 +6,7 @@ import React from "react";
 import ProductCard from "../components/ProductCard";
 import CacheBadge from "../components/CacheBadge";
 import { useFeaturedProducts } from "../hooks/useProducts";
-import "./FeaturedPage.css";
+import "../assets/css/FeaturedPage.css";
 
 export default function FeaturedPage() {
   const { products, loading, cacheMeta } = useFeaturedProducts();

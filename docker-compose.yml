@@ -1,48 +1,55 @@
-
 services:
-  # PostgreSQL Database
+
+  # ── PostgreSQL ───────────────────────────────────────────────────────────
   db:
     image: postgres:16-alpine
     container_name: redis_demo_db
+    restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-redis_demo}
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_DB:       ${POSTGRES_DB:-redis_demo}
+      POSTGRES_USER:     ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 10s
 
-  # Redis Cache
+  # ── Redis ────────────────────────────────────────────────────────────────
   redis:
     image: redis:7.2-alpine
     container_name: redis_demo_cache
-    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-redispass}
+    restart: unless-stopped
+    command: >
+      redis-server
+        --appendonly yes
+        --requirepass ${REDIS_PASSWORD:-redispass}
+        --maxmemory 256mb
+        --maxmemory-policy allkeys-lru
     volumes:
       - redis_data:/data
     ports:
       - "6379:6379"
     healthcheck:
-      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-redispass}", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 5s
 
-  # Django Backend
+  # ── Django backend ───────────────────────────────────────────────────────
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: redis_demo_backend
-    command: >
-      sh -c "python manage.py migrate &&
-             python manage.py collectstatic --noinput &&
-             gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 4 --reload"
+    restart: unless-stopped
+    command: sh -c "python manage.py migrate --noinput && python manage.py collectstatic --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 2 --reload --access-logfile - --error-logfile -"
     volumes:
       - ./backend:/app
       - static_volume:/app/staticfiles
@@ -62,13 +69,20 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
-  # Celery Worker
+  # ── Celery worker ────────────────────────────────────────────────────────
   celery_worker:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: redis_demo_celery_worker
+    restart: unless-stopped
     command: celery -A config worker -l info --concurrency=4
     volumes:
       - ./backend:/app
@@ -85,12 +99,13 @@ services:
       - redis
       - backend
 
-  # Celery Beat (Scheduler)
+  # ── Celery beat (scheduler) ──────────────────────────────────────────────
   celery_beat:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: redis_demo_celery_beat
+    restart: unless-stopped
     command: celery -A config beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
     volumes:
       - ./backend:/app
@@ -107,12 +122,13 @@ services:
       - redis
       - backend
 
-  # Flower - Celery Monitoring
+  # ── Flower (Celery dashboard) ────────────────────────────────────────────
   flower:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: redis_demo_flower
+    restart: unless-stopped
     command: celery -A config flower --port=5555
     ports:
       - "5555:5555"
@@ -125,51 +141,51 @@ services:
       - redis
       - celery_worker
 
-  # React Frontend
-  # frontend:
-  #   build:
-  #     context: ./frontend
-  #     dockerfile: Dockerfile
-  #   container_name: redis_demo_frontend
-  #   volumes:
-  #     - ./frontend:/app
-  #     - /app/node_modules
-  #   ports:
-  #     - "3000:3000"
-  #   environment:
-  #     - REACT_APP_API_URL=http://localhost:8000/api
-  #     - CHOKIDAR_USEPOLLING=true
-  #   depends_on:
-  #     - backend
-  #   stdin_open: true
-  #   tty: true
+  # ── React frontend (Vite) ────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: redis_demo_frontend
+    restart: unless-stopped
+    volumes:
+      - ./frontend:/app
+      - frontend_nm:/app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=/api
+      - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      - backend
+    stdin_open: true
+    tty: true
 
-  # # Nginx (Optional - for production-like setup)
-  # nginx:
-  #   image: nginx:alpine
-  #   container_name: redis_demo_nginx
-  #   ports:
-  #     - "80:80"
-  #   volumes:
-  #     - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-  #     - static_volume:/app/staticfiles
-  #     - media_volume:/app/media
-  #   depends_on:
-  #     - backend
-  #     - frontend
-  #   profiles:
-  #     - production
+  # ── Nginx (production profile only) ─────────────────────────────────────
+  nginx:
+    image: nginx:alpine
+    container_name: redis_demo_nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    depends_on:
+      - backend
+      - frontend
+    profiles:
+      - production
 
-  # # Selenium Hub for E2E testing
-  # selenium-hub:
-  #   image: selenium/hub:4.15.0
-  #   container_name: redis_demo_selenium_hub
-  #   ports:
-  #     - "4444:4444"
-  #   profiles:
-  #     - testing
+  # ── Selenium (testing profile only) ─────────────────────────────────────
+  selenium-hub:
+    image: selenium/hub:4.15.0
+    container_name: redis_demo_selenium_hub
+    ports:
+      - "4444:4444"
+    profiles:
+      - testing
 
-  # Chrome Node for Selenium
   chrome:
     image: selenium/node-chrome:4.15.0
     container_name: redis_demo_chrome
@@ -182,11 +198,13 @@ services:
     profiles:
       - testing
 
+
 volumes:
   postgres_data:
   redis_data:
   static_volume:
   media_volume:
+  frontend_nm:
 
 networks:
   default:

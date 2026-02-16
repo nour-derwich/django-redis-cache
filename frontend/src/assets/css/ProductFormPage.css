@@ -1,0 +1,65 @@
+/* ProductFormPage.css */
+
+.pfp-page {
+  min-height: 100vh;
+  background: #f8f9fc;
+  padding: 2rem 1rem 4rem;
+}
+
+.pfp-breadcrumb {
+  max-width: 820px;
+  margin: 0 auto 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.pfp-breadcrumb__link {
+  background: none;
+  border: none;
+  padding: 0;
+  color: #667eea;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.pfp-breadcrumb__link:hover { text-decoration: underline; }
+
+.pfp-breadcrumb__sep { color: #d1d5db; }
+
+.pfp-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 40vh;
+  gap: 1rem;
+  color: #6b7280;
+}
+
+.pfp-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #e5e7eb;
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: pfp-spin 0.7s linear infinite;
+}
+
+@keyframes pfp-spin { to { transform: rotate(360deg); } }
+
+.pfp-error { color: #ef4444; font-weight: 500; }
+
+.pfp-back {
+  background: none;
+  border: 1.5px solid #d1d5db;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  color: #374151;
+  font-family: inherit;
+}

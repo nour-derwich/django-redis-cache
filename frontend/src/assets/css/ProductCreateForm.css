@@ -1,0 +1,409 @@
+/* ProductCreateForm.css */
+
+.pcf-wrapper {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: 'DM Sans', 'Segoe UI', sans-serif;
+}
+
+/* ── Header ─────────────────────────────────────────────────────────────── */
+
+.pcf-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid #f1f1f1;
+}
+
+.pcf-header__icon {
+  font-size: 2.4rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.pcf-header__title {
+  margin: 0 0 0.25rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.pcf-header__sub {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+/* ── Server error ───────────────────────────────────────────────────────── */
+
+.pcf-server-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-left: 4px solid #ef4444;
+  border-radius: 8px;
+  padding: 0.875rem 1rem;
+  margin-bottom: 1.5rem;
+  color: #b91c1c;
+  font-size: 0.9rem;
+}
+
+/* ── Section ────────────────────────────────────────────────────────────── */
+
+.pcf-section {
+  border: 1.5px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.pcf-section__title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #667eea;
+  padding: 0 0.5rem;
+  margin-bottom: 0;
+}
+
+.pcf-section__body {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+/* ── Row layouts ────────────────────────────────────────────────────────── */
+
+.pcf-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.pcf-row--3 {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+@media (max-width: 600px) {
+  .pcf-row,
+  .pcf-row--3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Field ──────────────────────────────────────────────────────────────── */
+
+.pcf-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.pcf-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #374151;
+  letter-spacing: 0.01em;
+}
+
+.pcf-required {
+  color: #ef4444;
+  margin-left: 2px;
+}
+
+.pcf-hint {
+  margin: 0;
+  font-size: 0.76rem;
+  color: #9ca3af;
+  line-height: 1.4;
+}
+
+.pcf-error-msg {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #ef4444;
+  font-weight: 500;
+}
+
+/* ── Inputs ─────────────────────────────────────────────────────────────── */
+
+.pcf-input {
+  width: 100%;
+  padding: 0.6rem 0.875rem;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: #1f2937;
+  background: #fafafa;
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+  box-sizing: border-box;
+  outline: none;
+}
+
+.pcf-input:focus {
+  border-color: #667eea;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.12);
+}
+
+.pcf-input::placeholder {
+  color: #c4c9d4;
+}
+
+.pcf-field--error .pcf-input {
+  border-color: #ef4444;
+  background: #fff5f5;
+}
+
+.pcf-field--error .pcf-input:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
+}
+
+.pcf-textarea {
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.55;
+}
+
+.pcf-textarea--sm {
+  min-height: 72px;
+}
+
+.pcf-select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.875rem center;
+  padding-right: 2.5rem;
+}
+
+/* ── Input with prefix ($, /products/) ─────────────────────────────────── */
+
+.pcf-input-prefix {
+  display: flex;
+  align-items: stretch;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fafafa;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.pcf-input-prefix:focus-within {
+  border-color: #667eea;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.12);
+}
+
+.pcf-field--error .pcf-input-prefix {
+  border-color: #ef4444;
+  background: #fff5f5;
+}
+
+.pcf-prefix {
+  padding: 0.6rem 0.75rem;
+  background: #f3f4f6;
+  border-right: 1.5px solid #d1d5db;
+  font-size: 0.82rem;
+  color: #6b7280;
+  font-weight: 500;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+}
+
+.pcf-input-prefix .pcf-input {
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  flex: 1;
+}
+
+.pcf-input-prefix .pcf-input:focus {
+  border: none;
+  box-shadow: none;
+}
+
+/* ── Toggle (is_featured) ───────────────────────────────────────────────── */
+
+.pcf-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  padding: 0.6rem 0;
+  user-select: none;
+}
+
+.pcf-toggle input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.pcf-toggle__track {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  background: #d1d5db;
+  border-radius: 999px;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.pcf-toggle input:checked ~ .pcf-toggle__track {
+  background: #667eea;
+}
+
+.pcf-toggle__thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  transition: transform 0.2s;
+}
+
+.pcf-toggle input:checked ~ .pcf-toggle__track .pcf-toggle__thumb {
+  transform: translateX(20px);
+}
+
+.pcf-toggle__label {
+  font-size: 0.88rem;
+  color: #374151;
+  font-weight: 500;
+}
+
+/* ── Discount preview ───────────────────────────────────────────────────── */
+
+.pcf-discount-preview {
+  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+  border: 1px solid #86efac;
+  border-radius: 8px;
+  padding: 0.625rem 1rem;
+  font-size: 0.85rem;
+  color: #166534;
+}
+
+.pcf-discount-preview strong {
+  font-weight: 700;
+}
+
+/* ── Cache note ─────────────────────────────────────────────────────────── */
+
+.pcf-cache-note {
+  display: flex;
+  gap: 0.875rem;
+  background: linear-gradient(135deg, #eff6ff, #eef2ff);
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  align-items: flex-start;
+}
+
+.pcf-cache-note__icon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.pcf-cache-note strong {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #1e40af;
+  margin-bottom: 0.25rem;
+}
+
+.pcf-cache-note p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #3b82f6;
+  line-height: 1.5;
+}
+
+/* ── Actions ────────────────────────────────────────────────────────────── */
+
+.pcf-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-top: 0.5rem;
+}
+
+.pcf-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s;
+}
+
+.pcf-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.pcf-btn--primary {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.35);
+}
+
+.pcf-btn--primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(102, 126, 234, 0.45);
+}
+
+.pcf-btn--primary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.pcf-btn--ghost {
+  background: transparent;
+  color: #6b7280;
+  border: 1.5px solid #d1d5db;
+}
+
+.pcf-btn--ghost:hover:not(:disabled) {
+  background: #f9fafb;
+  border-color: #9ca3af;
+  color: #374151;
+}
+
+/* ── Spinner ────────────────────────────────────────────────────────────── */
+
+.pcf-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: pcf-spin 0.6s linear infinite;
+}
+
+@keyframes pcf-spin {
+  to { transform: rotate(360deg); }
+}

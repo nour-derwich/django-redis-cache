@@ -17,7 +17,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-dev-key-change
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = ['*'] if DEBUG else os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 # Application definition
 INSTALLED_APPS = [
@@ -45,9 +45,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.cache.UpdateCacheMiddleware',       # Django cache (must be first)
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.cache.FetchFromCacheMiddleware',    # Django cache (must be last-ish)
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -55,9 +53,9 @@ MIDDLEWARE = [
 
     # ── Custom Redis middleware ───────────────────────────────────────────────
     # Runs after auth so request.user is available
-    'config.middleware.CacheBypassMiddleware',             # Bypass Redis cache for staff users
-    'config.middleware.CacheMonitorMiddleware',            # Monitor Redis cache hits/misses
-    'config.middleware.RedisCacheHeaderMiddleware',       # Add cache-related headers to responses
+    'config.middleware.CacheMonitorMiddleware',      # adds X-Cache-Hit headers
+    'config.middleware.CacheBypassMiddleware',       # ?nocache=1 for staff
+    'config.middleware.RedisCacheHeaderMiddleware',  # Cache-Control headers
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -134,13 +132,9 @@ CACHES = {
 }
 
 # Session configuration - Use Redis
-SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 SESSION_CACHE_ALIAS = 'session'
 
-# Cache middleware settings
-CACHE_MIDDLEWARE_ALIAS = 'default'
-CACHE_MIDDLEWARE_SECONDS = int(os.environ.get('CACHE_MIDDLEWARE_SECONDS', 60))
-CACHE_MIDDLEWARE_KEY_PREFIX = 'middleware'
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -245,11 +239,6 @@ LOGGING = {
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
-            'formatter': 'verbose',
-        },
-        'file': {
-            'class': 'logging.FileHandler',
-            'filename': BASE_DIR / 'logs' / 'django.log',
             'formatter': 'verbose',
         },
     },

@@ -4,13 +4,15 @@
  */
 import React from 'react';
 import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom';
-import ProductsPage from './pages/ProductsPage';
-import FeaturedPage from './pages/FeaturedPage';
+import ProductsPage from './pages/ProductsPage.jsx';
+import FeaturedPage from './pages/FeaturedPage.jsx';
+import ProductFormPage from './pages/ProductFormPage.jsx';
 import './App.css';
 
 const LINKS = [
   { to: '/',         label: '📦 Products'  },
-  { to: '/featured', label: '⭐ Featured'  },
+  { to: '/featured',     label: '⭐ Featured'  },
+  { to: '/products/new', label: '➕ New Product' },
 ];
 
 const EXTERNAL = [
@@ -59,7 +61,9 @@ export default function App() {
           <div className="container">
             <Routes>
               <Route path="/"         element={<ProductsPage />} />
-              <Route path="/featured" element={<FeaturedPage />} />
+              <Route path="/featured"           element={<FeaturedPage />} />
+              <Route path="/products/new"       element={<ProductFormPage />} />
+              <Route path="/products/:id/edit" element={<ProductFormPage />} />
             </Routes>
           </div>
         </main>

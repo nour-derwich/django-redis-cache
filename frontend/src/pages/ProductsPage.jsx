@@ -9,7 +9,7 @@ import ProductModal from "../components/ProductModal";
 import FilterBar from "../components/FilterBar";
 import { useProducts } from "../hooks/useProducts";
 import { useCategories } from "../hooks/useCategories";
-import "./ProductsPage.css";
+import "../assets/css/ProductsPage.css";
 
 export default function ProductsPage() {
   const [filters, setFilters] = useState({});
