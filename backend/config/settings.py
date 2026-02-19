@@ -50,12 +50,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
-    # ── Custom Redis middleware ───────────────────────────────────────────────
-    # Runs after auth so request.user is available
-    'config.middleware.CacheMonitorMiddleware',      # adds X-Cache-Hit headers
-    'config.middleware.CacheBypassMiddleware',       # ?nocache=1 for staff
-    'config.middleware.RedisCacheHeaderMiddleware',  # Cache-Control headers
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -165,6 +159,10 @@ CORS_ALLOWED_ORIGINS = os.environ.get(
     'CORS_ALLOWED_ORIGINS',
     'http://localhost:3000,http://127.0.0.1:3000'
 ).split(',')
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+]
 CORS_ALLOW_CREDENTIALS = True
 
 # REST Framework Configuration

@@ -1,0 +1,310 @@
+/* LoginPage.css — terminal / dev tool aesthetic */
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Syne:wght@700;800&display=swap');
+
+.lp-root {
+  min-height: 100vh;
+  background: #0d0f14;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle dot-grid background */
+.lp-grid {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, #ffffff08 1px, transparent 1px);
+  background-size: 28px 28px;
+  pointer-events: none;
+}
+
+/* Glowing orb */
+.lp-root::before {
+  content: '';
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, #667eea18 0%, transparent 70%);
+  top: -200px;
+  right: -100px;
+  pointer-events: none;
+}
+
+/* ── Layout ─────────────────────────────────────────────────────────────── */
+
+.lp-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  width: 100%;
+  max-width: 860px;
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 680px) {
+  .lp-layout { grid-template-columns: 1fr; }
+  .lp-terminal { display: none; }
+}
+
+/* ── Terminal panel ──────────────────────────────────────────────────────── */
+
+.lp-terminal {
+  background: #111318;
+  border: 1px solid #2a2d3a;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px #ffffff08, 0 24px 48px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+}
+
+.lp-terminal__bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.75rem 1rem;
+  background: #1a1d24;
+  border-bottom: 1px solid #2a2d3a;
+}
+
+.lp-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+.lp-dot--red    { background: #ff5f57; }
+.lp-dot--yellow { background: #ffbd2e; }
+.lp-dot--green  { background: #28c840; }
+
+.lp-terminal__title {
+  margin-left: 0.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  color: #4a5068;
+}
+
+.lp-terminal__body {
+  padding: 1.25rem;
+  flex: 1;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  line-height: 1.9;
+  min-height: 220px;
+}
+
+.lp-line {
+  color: #5a6080;
+  animation: lp-fade-in 0.3s ease forwards;
+}
+
+.lp-line--out { color: #8892b0; }
+.lp-line--ok  { color: #28c840; }
+.lp-line--err { color: #ff5f57; }
+
+@keyframes lp-fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.lp-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 15px;
+  background: #667eea;
+  vertical-align: middle;
+  animation: lp-blink 1s step-end infinite;
+}
+
+@keyframes lp-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+/* ── Login card ──────────────────────────────────────────────────────────── */
+
+.lp-card {
+  background: #13151c;
+  border: 1px solid #2a2d3a;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 0 0 1px #ffffff06, 0 24px 48px rgba(0,0,0,0.4);
+}
+
+.lp-card__header {
+  margin-bottom: 1.75rem;
+}
+
+.lp-badge {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  padding: 0.25rem 0.6rem;
+  background: #667eea18;
+  color: #667eea;
+  border: 1px solid #667eea33;
+  border-radius: 4px;
+  margin-bottom: 0.875rem;
+}
+
+.lp-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: #f0f2f8;
+  margin: 0 0 0.375rem;
+  letter-spacing: -0.02em;
+}
+
+.lp-sub {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #4a5068;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ── Alert ───────────────────────────────────────────────────────────────── */
+
+.lp-alert {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  background: #ff5f5712;
+  border: 1px solid #ff5f5730;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.25rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  color: #ff5f57;
+}
+
+.lp-alert__icon {
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ── Form ────────────────────────────────────────────────────────────────── */
+
+.lp-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.lp-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.lp-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  color: #4a5068;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.lp-input {
+  background: #0d0f14;
+  border: 1px solid #2a2d3a;
+  border-radius: 8px;
+  padding: 0.7rem 0.875rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.88rem;
+  color: #c8cfe8;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.lp-input:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px #667eea20;
+}
+
+.lp-input::placeholder { color: #2a2d3a; }
+
+/* ── Submit button ───────────────────────────────────────────────────────── */
+
+.lp-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.8rem;
+  margin-top: 0.5rem;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  letter-spacing: 0.02em;
+}
+
+.lp-btn:hover:not(:disabled) {
+  background: #7b8ff0;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px #667eea40;
+}
+
+.lp-btn:active:not(:disabled) { transform: translateY(0); }
+.lp-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.lp-spinner {
+  width: 13px;
+  height: 13px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: lp-spin 0.6s linear infinite;
+}
+
+@keyframes lp-spin { to { transform: rotate(360deg); } }
+
+/* ── Footer ──────────────────────────────────────────────────────────────── */
+
+.lp-footer {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #1e2130;
+}
+
+.lp-footer p {
+  margin: 0 0 0.375rem;
+  font-size: 0.78rem;
+  color: #4a5068;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.lp-link {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  color: #667eea;
+  text-decoration: none;
+}
+
+.lp-link:hover { text-decoration: underline; }
+
+.lp-footer__cmd {
+  margin-top: 0.75rem !important;
+  font-size: 0.68rem !important;
+  color: #2e3347 !important;
+  line-height: 1.6;
+}
+
+.lp-footer__cmd code {
+  color: #3d4460;
+  word-break: break-all;
+}
