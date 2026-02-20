@@ -3,38 +3,66 @@
  *
  * Route: /products/new          → create mode
  * Route: /products/:id/edit     → edit mode (fetches product by id)
- *
- * Add to App.jsx:
- *   import ProductFormPage from './pages/ProductFormPage.jsx'
- *   <Route path="/products/new"      element={<ProductFormPage />} />
- *   <Route path="/products/:id/edit" element={<ProductFormPage />} />
  */
 import React, { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useLocation } from 'react-router-dom'
 import ProductCreateForm from '../components/ProductCreateForm.jsx'
+import LoginForm         from '../components/LoginForm.jsx'
+import { useAuth }       from '../context/AuthContext.jsx'
+import { productsAPI }   from '../services/api.jsx'
 import '../assets/css/ProductFormPage.css'
 
 export default function ProductFormPage() {
-  const { id }     = useParams()
-  const navigate   = useNavigate()
-  const isEditing  = Boolean(id)
+  const { id }              = useParams()
+  const navigate            = useNavigate()
+  const location            = useLocation()
+  const { isAuthenticated } = useAuth()
+  const isEditing           = Boolean(id)
 
-  const [product, setProduct] = useState(null)
-  const [loading, setLoading] = useState(isEditing)
-  const [error,   setError]   = useState(null)
+  const [product,   setProduct]   = useState(null)
+  const [loading,   setLoading]   = useState(isEditing)
+  const [error,     setError]     = useState(null)
+  const [showLogin, setShowLogin] = useState(false)
 
+  // Show login modal if not authenticated
   useEffect(() => {
-    if (!isEditing) return
-    import('../services/api.jsx').then(({ productsAPI }) =>
-      productsAPI.detail(id)
-        .then(r => setProduct(r.data))
-        .catch(() => setError('Product not found or failed to load.'))
-        .finally(() => setLoading(false))
-    )
-  }, [id, isEditing])
+    if (!isAuthenticated) setShowLogin(true)
+    else setShowLogin(false)
+  }, [isAuthenticated])
+
+  // Fetch product when editing
+  useEffect(() => {
+    if (!isEditing || !isAuthenticated) return
+    setLoading(true)
+    productsAPI.detail(id)
+      .then(r => setProduct(r.data))
+      .catch(() => setError('Product not found or failed to load.'))
+      .finally(() => setLoading(false))
+  }, [id, isEditing, isAuthenticated])
 
   function handleSuccess(saved) {
-    navigate(`/`, { state: { flash: `"${saved.name}" ${isEditing ? 'updated' : 'created'} successfully!` } })
+    const action = isEditing ? 'updated' : 'created'
+    // Navigate back with state that triggers parent refetch
+    navigate('/', {
+      replace: true,
+      state: {
+        toast: {
+          message: `"${saved.name}" ${action} successfully`,
+          type: 'success',
+        },
+        refetch: true,  // signal to ProductsPage to refetch
+      },
+    })
+  }
+
+  if (showLogin) {
+    return (
+      <LoginForm
+        message="You need to sign in to create or edit products."
+        onSuccess={() => setShowLogin(false)}
+        onCancel={() => navigate(-1)}
+      />
+    )
   }
 
   if (loading) {

@@ -6,7 +6,6 @@
  */
 import React, { useState } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
-import './LoginForm.css'
 
 export default function LoginForm({ onSuccess, onCancel, message }) {
   const { login, loading } = useAuth()

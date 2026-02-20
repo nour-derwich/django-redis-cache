@@ -74,27 +74,58 @@ export function useFeaturedProducts() {
   return { products, loading, cacheMeta };
 }
 
+// export function useStatistics() {
+//   const [stats, setStats] = useState(null);
+//   const [loading, setLoading] = useState(true);
+//   const [cacheMeta, setCacheMeta] = useState(null);
+
+//   const fetch = useCallback(() => {
+//     setLoading(true);
+//     productsAPI
+//       .statistics()
+//       .then((res) => {
+//         setStats(res.data);
+//         setCacheMeta(res.cacheMeta);
+//       })
+//       .finally(() => setLoading(false));
+//   }, []);
+
+//   useEffect(() => {
+//     fetch();
+//     const interval = setInterval(fetch, 15000); // re-poll every 15 s
+//     return () => clearInterval(interval);
+//   }, [fetch]);
+
+//   return { stats, loading, cacheMeta };
+// }
 export function useStatistics() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [cacheMeta, setCacheMeta] = useState(null);
 
-  const fetch = useCallback(() => {
+  const fetch = useCallback(async () => {
     setLoading(true);
-    productsAPI
-      .statistics()
-      .then((res) => {
-        setStats(res.data);
-        setCacheMeta(res.cacheMeta);
-      })
-      .finally(() => setLoading(false));
+    try {
+      const res = await productsAPI.statistics();
+      setStats(res.data);
+      setCacheMeta(res.cacheMeta);
+      setError(null);
+    } catch (err) {
+      // Don't wipe existing stats on a failed refresh
+      setError(err.response?.data?.detail ?? err.message);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
     fetch();
-    const interval = setInterval(fetch, 15000); // re-poll every 15 s
+    // Slow the poll way down — statistics don't need 15-second refresh.
+    // Remove the interval entirely if real-time data isn't required.
+    const interval = setInterval(fetch, 5 * 60 * 1000); // every 5 minutes
     return () => clearInterval(interval);
   }, [fetch]);
 
-  return { stats, loading, cacheMeta };
+  return { stats, loading, error, cacheMeta, refetch: fetch };
 }
