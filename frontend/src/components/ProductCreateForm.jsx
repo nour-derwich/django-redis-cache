@@ -4,10 +4,6 @@
  * Full create/edit form for products.
  * - POST to /api/products/        when creating
  * - PATCH to /api/products/:id/   when editing (pass `product` prop)
- *
- * Usage:
- *   <ProductCreateForm onSuccess={(p) => console.log(p)} onCancel={() => {}} />
- *   <ProductCreateForm product={existing} onSuccess={...} onCancel={...} />
  */
 import React, { useState, useEffect } from 'react'
 import { productsAPI } from '../services/api.jsx'
@@ -45,13 +41,17 @@ function slugify(str) {
 
 function toFormState(product) {
   if (!product) return EMPTY
+  
+  // Extract category ID — API returns full object {id, name, slug, ...}
+  const categoryId = product.category?.id ?? product.category ?? ''
+  
   return {
     name:               product.name               ?? '',
     slug:               product.slug               ?? '',
     sku:                product.sku                ?? '',
     short_description:  product.short_description  ?? '',
     description:        product.description        ?? '',
-    category:           product.category           ?? '',
+    category:           categoryId,  // ← use category.id, not the whole object
     price:              product.price              ?? '',
     compare_at_price:   product.compare_at_price   ?? '',
     cost:               product.cost               ?? '',
@@ -154,7 +154,6 @@ export default function ProductCreateForm({ product: initialProduct, onSuccess, 
     const validationErrors = validate()
     if (Object.keys(validationErrors).length) {
       setErrors(validationErrors)
-      // Scroll to first error
       document.querySelector('.pcf-field--error')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
       return
     }
@@ -178,7 +177,6 @@ export default function ProductCreateForm({ product: initialProduct, onSuccess, 
     } catch (err) {
       const data = err.response?.data
       if (data && typeof data === 'object') {
-        // Map Django field errors back to the form
         const fieldErrors = {}
         let generic = null
         for (const [key, val] of Object.entries(data)) {
